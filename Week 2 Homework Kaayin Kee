@@ -1,0 +1,143 @@
+Sub tickers()
+
+'Set-up 
+'--------------------------------------------------
+
+    'Loop through all sheets
+    For Each ws In Worksheets
+    
+'--------------------------------
+
+    'Define variables
+    Dim Ticker As String
+
+    Dim Yearly_Change As Double
+
+    Dim Percent_Change As Double
+        Percent_Change = 0
+
+    Dim TSV As Variant
+        TSV = 0
+        
+    Dim Stock_Open As Double
+        Stock_Open = 0
+        
+    Dim Stock_Close As Double
+        Stock_Close = 0
+        
+    Dim Price_Change As Double
+        Price_Change = 0
+        
+
+    'Make a few new columns
+    ''Is it necessary to code a new column if there are space for new columns already?
+    ''i.e. If we don't have to squeeze it in somewhere?
+    
+    'Ticker
+    ws.Range("I1").EntireColumn.Insert
+    ws.Cells(1, 9).Value = "Ticker"
+
+    'Yearly Change
+    ws.Range("J1").EntireColumn.Insert
+    ws.Cells(1, 10).Value = "Yearly Change"
+    
+    'Percent Change
+    ws.Range("K1").EntireColumn.Insert
+    ws.Cells(1, 11).Value = "Percent Change"
+    
+    'Total Stock Volume
+    ws.Range("L1").EntireColumn.Insert
+    ws.Cells(1, 12).Value = "Total Stock Volume"
+    
+    'Define table for new details
+    Dim Summary_Table As String
+    Summary_Table = 2
+
+    'Find last row
+    Dim LastRow As Double
+    LastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+'--------------------------------------------------
+
+'Begin loop
+For I = 2 To LastRow
+
+    'For same ticker values until different ticker values
+    If ws.Cells(I + 1, 1).Value <> ws.Cells(I, 1).Value Then
+    
+        'Define ticker column
+        Ticker = ws.Cells(I, 1).Value
+    
+        'Add up TSV
+        TSV = TSV + ws.Cells(I, 7).Value
+        
+        'Calculate total of opening prices
+        Stock_Open = Stock_Open + ws.Cells(I, 3).Value
+        
+        'Calculate total of closing prices
+        Stock_Close = Stock_Close + ws.Cells(I, 6).Value
+        
+        'Calculate change in price
+        'Need to change to first and last values for each
+        Price_Change = (Stock_Close - Stock_Open)
+        
+        'Calculate percentage change
+            If Stock_Open = 0 Then
+            
+                Percent_Change = 0
+            
+            Else
+        
+                Percent_Change = Round(100 * (Price_Change / Stock_Open))
+    
+            End If
+    
+        'Colours; add when price change is right
+            'If Price_Change > 0 Then
+                'ws.Range("J" & Summary_Table).Interior.ColorIndex = 4
+    
+            'ElseIf P_Change < 0 Then
+                'ws.Range("J" & Summary_Table).Interior.ColorIndex = 3
+            
+            'Else
+                'ws.Range("J" & Summary_Table).Interior.ColorIndex = 2
+    
+            'End If
+    
+        'Printing
+        'Print ticker name in summary table
+        ws.Range("I" & Summary_Table).Value = Ticker
+    
+        'Print TSV in summary table
+        ws.Range("L" & Summary_Table).Value = TSV
+    
+        'Print price change in summary table
+        ws.Range("J" & Summary_Table).Value = Price_Change
+        
+        'Print percentage change in summary table
+        ws.Range("K" & Summary_Table).Value = Percent_Change
+        
+        'Go to next line in summary table
+        Summary_Table = Summary_Table + 1
+        
+        'Reset values
+        TSV = 0
+        
+        Price_Change = 0
+        
+        Percent_Change = 0
+
+    Else
+    
+    'Add to TSV
+    TSV = TSV + ws.Cells(I, 7).Value
+
+    End If
+
+Next I
+
+Next ws
+
+End Sub
+
+
